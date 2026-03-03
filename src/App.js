@@ -62,5 +62,12 @@ function App() {
     </div>
   );
 }
+import Home from "./pages/Home";
+
+function App() {
+  return <Home />;
+}
+
+export default App;
 
 export default App;
