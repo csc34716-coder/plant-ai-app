@@ -1,10 +1,12 @@
-import { useState } from "react";
+const [loading, setLoading] = useState(false); // नई स्टेट
 
-function App() {
-  const [image, setImage] = useState(null);
-  const [result, setResult] = useState("");
+const handleUpload = async () => {
+  if (!image) return alert("Please select an image first!");
+  
+  setLoading(true);
+  setResult(""); 
 
-  const handleUpload = async () => {
+  try {
     const formData = new FormData();
     formData.append("image", image);
 
@@ -14,22 +16,19 @@ function App() {
     });
 
     const data = await res.json();
-    setResult(data.result);
-  };
+    console.log(data);
+    
+    // अगर बैकएंड से 'result' नहीं बल्कि कुछ और आ रहा है तो उसे यहाँ बदलें
+    setResult(data.result || "Analysis complete (check console for data)"); 
+  } catch (error) {
+    console.error("Error:", error);
+    setResult("Failed to get result from server.");
+  } finally {
+    setLoading(false);
+  }
+};
 
-  return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h1>🌱 Plant Disease Detector</h1>
-
-      <input type="file" onChange={(e) => setImage(e.target.files[0])} />
-
-      <br /><br />
-
-      <button onClick={handleUpload}>Upload</button>
-
-      <h3>{result}</h3>
-    </div>
-  );
-}
-
-export default App;
+// UI में बटन को ऐसे बदलें:
+<button onClick={handleUpload} disabled={loading}>
+  {loading ? "Processing..." : "Upload & Analyze"}
+</button>
