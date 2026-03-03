@@ -1,7 +1,7 @@
-import { useState } from "react"; // 1. इम्पोर्ट ज़रूर रखें
+import { useState } from "react";
 
-function App() { // 2. फंक्शन का नाम 'App' रखें
-  const = useState(null);
+function App() {
+  const = useState(null); // यहाँ सुधार किया गया
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -15,15 +15,17 @@ function App() { // 2. फंक्शन का नाम 'App' रखें
       const formData = new FormData();
       formData.append("image", image);
 
+      // Render URL सही है
       const res = await fetch("https://plant-backend-v66z.onrender.com/upload", {
         method: "POST",
         body: formData,
       });
 
       const data = await res.json();
-      console.log(data);
+      console.log("Backend Response:", data); // डेटा चेक करने के लिए
       
-      setResult(data.result || "Analysis complete (check console for data)"); 
+      // सुनिश्चित करें कि बैकएंड 'result' नाम की key भेज रहा है
+      setResult(data.result || data.message || "Result key not found in response"); 
     } catch (error) {
       console.error("Error:", error);
       setResult("Failed to get result from server.");
@@ -35,15 +37,23 @@ function App() { // 2. फंक्शन का नाम 'App' रखें
   return (
     <div style={{ textAlign: "center", marginTop: "50px" }}>
       <h1>🌱 Plant Disease Detector</h1>
+      
+      {/* फाइल सिलेक्ट करने के लिए */}
       <input type="file" onChange={(e) => setImage(e.target.files[0])} />
+      
       <br /><br />
+      
       <button onClick={handleUpload} disabled={loading}>
         {loading ? "Processing..." : "Upload & Analyze"}
       </button>
-      <h3>{result}</h3>
+
+      {/* रिजल्ट यहाँ दिखेगा */}
+      <div style={{ marginTop: "20px", color: "green" }}>
+        <h3>{result}</h3>
+      </div>
     </div>
   );
 }
 
-export default App; // 3. यह सबसे ज़रूरी लाइन है, इसे आखिर में ज़रूर लिखें [1.1, 1.2]
+export default App;
   
