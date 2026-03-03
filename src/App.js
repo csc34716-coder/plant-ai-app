@@ -1,59 +1,34 @@
-import { useState } from "react";
+const [image, setImage] = useState(null); // यहाँ 'image' और 'setImage' जोड़ें
+const [result, setResult] = useState("");
+const [loading, setLoading] = useState(false);
 
-function App() {
-  const = useState(null); // यहाँ सुधार किया गया
-  const [result, setResult] = useState("");
-  const [loading, setLoading] = useState(false);
+const handleUpload = async () => {
+  if (!image) return alert("Please select an image first!");
+  setLoading(true);
+  setResult(""); 
 
-  const handleUpload = async () => {
-    if (!image) return alert("Please select an image first!");
+  try {
+    const formData = new FormData();
+    formData.append("image", image);
+
+    const res = await fetch("https://plant-backend-v66z.onrender.com/upload", {
+      method: "POST",
+      body: formData,
+    });
+
+    const responseData = await res.json();
+    console.log("Backend Full Response:", responseData);
     
-    setLoading(true);
-    setResult(""); 
-
-    try {
-      const formData = new FormData();
-      formData.append("image", image);
-
-      // Render URL सही है
-      const res = await fetch("https://plant-backend-v66z.onrender.com/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = await res.json();
-      console.log("Backend Response:", data); // डेटा चेक करने के लिए
-      
-      // सुनिश्चित करें कि बैकएंड 'result' नाम की key भेज रहा है
-      setResult(data.result || data.message || "Result key not found in response"); 
-    } catch (error) {
-      console.error("Error:", error);
-      setResult("Failed to get result from server.");
-    } finally {
-      setLoading(false);
+    // सुधार: बैकएंड 'data' की (key) में रिजल्ट भेज रहा है
+    if (responseData.success && responseData.data) {
+      const info = responseData.data;
+      setResult(`Status: ${info.status} | Disease: ${info.disease} | Solution: ${info.treatment}`);
+    } else {
+      setResult("Analysis failed: " + (responseData.error || "Unknown error"));
     }
-  };
-
-  return (
-    <div style={{ textAlign: "center", marginTop: "50px" }}>
-      <h1>🌱 Plant Disease Detector</h1>
-      
-      {/* फाइल सिलेक्ट करने के लिए */}
-      <input type="file" onChange={(e) => setImage(e.target.files[0])} />
-      
-      <br /><br />
-      
-      <button onClick={handleUpload} disabled={loading}>
-        {loading ? "Processing..." : "Upload & Analyze"}
-      </button>
-
-      {/* रिजल्ट यहाँ दिखेगा */}
-      <div style={{ marginTop: "20px", color: "green" }}>
-        <h3>{result}</h3>
-      </div>
-    </div>
-  );
-}
-
-export default App;
-  
+  } catch (error) {
+    setResult("Server Error: " + error.message);
+  } finally {
+    setLoading(false);
+  }
+};
