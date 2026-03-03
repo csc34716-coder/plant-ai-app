@@ -6,14 +6,14 @@ function App() {
   const [result, setResult] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleImageChange = (e) => {
+  const handleImage = (e) => {
     const file = e.target.files[0];
     setImage(file);
-    setPreview(URL.createObjectURL(file)); // preview image
+    setPreview(URL.createObjectURL(file));
   };
 
   const handleUpload = async () => {
-    if (!image) return alert("Please select an image");
+    if (!image) return alert("Select image first");
 
     setLoading(true);
     setResult("");
@@ -38,8 +38,7 @@ function App() {
       } else {
         setResult("❌ " + (data.error || "No result"));
       }
-
-    } catch (err) {
+    } catch {
       setResult("❌ Server error");
     } finally {
       setLoading(false);
@@ -49,26 +48,25 @@ function App() {
   return (
     <div style={styles.container}>
       
-      <h1 style={styles.title}>🌱 Plant AI</h1>
+      <h1 style={styles.logo}>🌱 PlantCare AI</h1>
 
-      {/* Upload Card */}
       <div style={styles.card}>
-        
-        <input type="file" onChange={handleImageChange} />
+        <p style={styles.subtitle}>Upload plant image to detect disease</p>
+
+        <input type="file" onChange={handleImage} style={styles.input} />
 
         {preview && (
           <img src={preview} alt="preview" style={styles.image} />
         )}
 
         <button onClick={handleUpload} style={styles.button}>
-          {loading ? "Analyzing..." : "Upload & Analyze"}
+          {loading ? "Analyzing..." : "Analyze Plant"}
         </button>
       </div>
 
-      {/* Result Card */}
       {result && (
-        <div style={styles.resultCard}>
-          <h3>Result</h3>
+        <div style={styles.resultBox}>
+          <h3>🌿 Analysis Result</h3>
           <pre style={styles.resultText}>{result}</pre>
         </div>
       )}
@@ -79,48 +77,66 @@ function App() {
 
 const styles = {
   container: {
+    minHeight: "100vh",
+    background: "linear-gradient(135deg, #d4fc79, #96e6a1)",
     textAlign: "center",
     padding: "20px",
-    fontFamily: "Arial",
-    background: "#f4f6f8",
-    minHeight: "100vh",
+    fontFamily: "Segoe UI",
   },
-  title: {
-    color: "#2e7d32",
+
+  logo: {
+    color: "#1b5e20",
+    marginBottom: "20px",
   },
+
   card: {
-    background: "#fff",
+    background: "rgba(255,255,255,0.2)",
+    backdropFilter: "blur(10px)",
     padding: "20px",
-    borderRadius: "10px",
-    boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+    borderRadius: "15px",
     maxWidth: "350px",
     margin: "auto",
+    boxShadow: "0 8px 25px rgba(0,0,0,0.1)",
   },
+
+  subtitle: {
+    fontSize: "14px",
+    marginBottom: "10px",
+  },
+
+  input: {
+    marginBottom: "10px",
+  },
+
+  image: {
+    width: "100%",
+    borderRadius: "10px",
+    marginTop: "10px",
+  },
+
   button: {
     marginTop: "15px",
-    padding: "10px",
+    padding: "12px",
     width: "100%",
     background: "#2e7d32",
     color: "#fff",
     border: "none",
-    borderRadius: "5px",
+    borderRadius: "8px",
+    fontWeight: "bold",
     cursor: "pointer",
   },
-  image: {
-    marginTop: "10px",
-    width: "100%",
-    borderRadius: "10px",
-  },
-  resultCard: {
+
+  resultBox: {
     marginTop: "20px",
-    background: "#fff",
+    background: "#ffffff",
     padding: "20px",
-    borderRadius: "10px",
+    borderRadius: "12px",
     maxWidth: "350px",
     marginLeft: "auto",
     marginRight: "auto",
-    boxShadow: "0 4px 10px rgba(0,0,0,0.1)",
+    boxShadow: "0 6px 20px rgba(0,0,0,0.1)",
   },
+
   resultText: {
     whiteSpace: "pre-wrap",
     textAlign: "left",
