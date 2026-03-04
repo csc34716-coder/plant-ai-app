@@ -161,5 +161,16 @@ function App() {
     </div>
   );
 }
+function App() {
+  return (
+    <div>
+      <h1 className="text-4xl text-green-600 font-bold">
+        Tailwind Working 🚀
+      </h1>
+    </div>
+  );
+}
 
 export default App;
+export default App;
+
