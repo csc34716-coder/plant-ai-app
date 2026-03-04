@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Upload, Loader2, Moon, Sun, Leaf } from "lucide-react";
-import { motion } from "framer-motion";
+
 
 function App() {
   const [image, setImage] = useState(null);
