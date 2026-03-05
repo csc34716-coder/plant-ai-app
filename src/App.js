@@ -1,14 +1,4 @@
 import { useState, useEffect } from "react";
-import { db } from "./firebase";
-import {
-  collection,
-  addDoc,
-  serverTimestamp,
-  query,
-  orderBy,
-  onSnapshot,
-  limit
-} from "firebase/firestore";
 
 import {
   Upload,
@@ -18,7 +8,6 @@ import {
   Leaf,
   Image as ImageIcon,
   CheckCircle2,
-  History,
   MessageSquare
 } from "lucide-react";
 
@@ -39,23 +28,6 @@ function App() {
     return false;
   });
 
-  const [scans, setScans] = useState([]);
-
-  // Load history
-  useEffect(() => {
-    const q = query(
-      collection(db, "plantHistory"),
-      orderBy("timestamp", "desc"),
-      limit(6)
-    );
-
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      setScans(snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
-    });
-
-    return () => unsubscribe();
-  }, []);
-
   // Dark mode toggle
   useEffect(() => {
     if (darkMode) {
@@ -68,11 +40,13 @@ function App() {
   }, [darkMode]);
 
   const handleImage = (file) => {
+
     if (!file) return;
 
     setImage(file);
     setPreview(URL.createObjectURL(file));
     setResult(null);
+
   };
 
   const handleUpload = async () => {
@@ -101,21 +75,12 @@ function App() {
       if (data.success) {
 
         setResult(data.data);
-
-        // Save to Firestore
-        await addDoc(collection(db, "plantHistory"), {
-          disease: data.data.disease || "Unknown",
-          status: data.data.status || "Analyzed",
-          treatment: data.data.treatment || "Check result",
-          imageUrl: data.image_url, // Cloudinary image URL
-          userNote: userQuery,
-          timestamp: serverTimestamp()
-        });
-
         setUserQuery("");
 
       } else {
+
         setResult({ error: data.error || "Analysis failed" });
+
       }
 
     } catch (err) {
@@ -123,11 +88,15 @@ function App() {
       setResult({ error: "Upload failed. Check connection." });
 
     } finally {
+
       setLoading(false);
+
     }
+
   };
 
   return (
+
     <div
       className={`min-h-screen transition-colors duration-500 pb-20 
       bg-gradient-to-b from-green-50 to-white 
@@ -273,57 +242,8 @@ function App() {
 
         )}
 
-        {/* History */}
-
-        <div className="space-y-6 pt-6">
-
-          <div className="flex items-center gap-3 px-2">
-            <History className="text-emerald-500" size={24} />
-            <h3 className="font-bold text-xl uppercase">
-              Recent Scans
-            </h3>
-          </div>
-
-          <div className="grid gap-4">
-
-            {scans.map((scan) => (
-
-              <div
-                key={scan.id}
-                className="p-4 bg-white/60 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 rounded-3xl flex items-center gap-4 shadow-sm"
-              >
-
-                <img
-                  src={scan.imageUrl}
-                  className="w-14 h-14 rounded-2xl object-cover"
-                  alt="plant"
-                />
-
-                <div className="flex-1">
-
-                  <p className="font-black text-sm uppercase">
-                    {scan.disease}
-                  </p>
-
-                  <p className="text-xs opacity-40">
-                    {scan.timestamp?.toDate().toLocaleDateString()}
-                  </p>
-
-                </div>
-
-                <div className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-600">
-                  {scan.status}
-                </div>
-
-              </div>
-
-            ))}
-
-          </div>
-
-        </div>
-
       </main>
+
     </div>
   );
 }
