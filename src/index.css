@@ -1,3 +1,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* एक्स्ट्रा स्मूथ ट्रांजिशन के लिए */
+body {
+  transition: background-color 0.5s ease;
+}
