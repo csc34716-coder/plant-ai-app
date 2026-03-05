@@ -35,7 +35,7 @@ function App() {
       const formData = new FormData();      
       formData.append("image", image);      
   
-      const res = await fetch("https://plant-backend-v66z.onrender.com", {      
+      const res = await fetch("https://plant-backend-v66z.onrender.com/upload", {      
         method: "POST",      
         body: formData,      
       });      
