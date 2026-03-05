@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
+import './tailwind.css';
+// original index.css is used as Tailwind input for the CLI generator
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import "./index.css";
