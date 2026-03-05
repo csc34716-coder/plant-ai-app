@@ -8,7 +8,13 @@ function App() {
   const [preview, setPreview] = useState(null);
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    // initialize from localStorage if available
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('darkMode') === 'true';
+    }
+    return false;
+  });
   const [scans, setScans] = useState([]);
 
   useEffect(() => {
@@ -18,6 +24,17 @@ function App() {
     });
     return () => unsubscribe();
   }, []);
+
+  // sync dark mode with <html> class and localStorage
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('darkMode', 'true');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('darkMode', 'false');
+    }
+  }, [darkMode]);
 
   const handleImage = (file) => {
     if (!file) return;
@@ -60,23 +77,30 @@ function App() {
   };
 
   return (
-    <div className={`${darkMode ? "dark bg-slate-950 text-white" : "bg-slate-50 text-slate-900"} min-h-screen transition-colors duration-300 pb-10`}>
-      <nav className="p-4 flex justify-between items-center max-w-2xl mx-auto border-b border-slate-200 dark:border-slate-800">      
-        <div className="flex items-center gap-2 text-emerald-600 font-black">      
-          <Leaf className="w-6 h-6" />      
-          <span className="text-xl uppercase tracking-tighter">Plant.AI</span>      
-        </div>      
-        <button onClick={() => setDarkMode(!darkMode)} className={`p-2 rounded-full ${darkMode ? "bg-slate-800 text-yellow-400" : "bg-white text-slate-600 shadow-sm border"}`}>
+    <div className={`min-h-screen transition-colors duration-500 pb-10 bg-gradient-to-b from-green-100 to-white dark:from-slate-900 dark:to-slate-950 ${darkMode ? 'text-white' : 'text-slate-900'}`}>
+
+      <nav className="p-4 flex justify-between items-center max-w-2xl mx-auto border-b border-slate-200 dark:border-slate-800 shadow-sm bg-white/60 dark:bg-slate-900/60 backdrop-blur-md rounded-b-3xl">
+        <div className="flex items-center gap-2 text-emerald-600 font-black">
+          <Leaf className="w-6 h-6" />
+          <span className="text-xl uppercase tracking-tighter">Plant.AI</span>
+        </div>
+        <button
+          onClick={() => setDarkMode((prev) => !prev)}
+          className={`p-2 rounded-full transition-colors duration-200 ${
+            darkMode ? 'bg-slate-800 text-yellow-400' : 'bg-white text-slate-600 shadow-sm border'
+          }`}
+          aria-label="Toggle dark mode"
+        >
           {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-        </button>      
-      </nav>      
+        </button>
+      </nav>
   
       <main className="p-6 max-w-2xl mx-auto space-y-8">      
         <header className="text-center">      
           <h2 className="text-3xl font-black italic uppercase tracking-widest text-emerald-700 dark:text-emerald-500">Plant Health Scan</h2>      
         </header>      
   
-        <div className={`${darkMode ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200"} p-6 rounded-[2rem] border shadow-2xl backdrop-blur-md`}>      
+        <div className={`${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'} p-6 rounded-[2rem] border shadow-2xl backdrop-blur-md`}>      
           <div className="space-y-4">      
             {!preview ? (      
               <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 rounded-[1.5rem] p-10 cursor-pointer hover:border-emerald-500 transition-all bg-slate-50/50">      
@@ -120,24 +144,27 @@ function App() {
           </div>      
         )}
 
-        <div className="space-y-4 pt-4">
+        <div className="space-y-6 pt-6">
            <div className="flex items-center gap-2 px-2">
-              <History className="text-emerald-500" size={20} />
-              <h3 className="font-bold text-lg uppercase tracking-tight">Recent Scans</h3>
+              <History className="text-emerald-500" size={24} />
+              <h3 className="font-bold text-xl uppercase tracking-tight">Recent Scans</h3>
            </div>
-           <div className="grid gap-3">
+           <div className="grid gap-4">
               {scans.length > 0 ? scans.map(scan => (
-                <div key={scan.id} className="p-4 bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-2xl flex justify-between items-center shadow-sm">
+                <div
+                  key={scan.id}
+                  className="p-5 bg-white/80 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-3xl flex justify-between items-center shadow-lg backdrop-blur-md transition-transform transform hover:scale-105"
+                >
                    <div>
-                      <p className="font-black text-sm uppercase text-slate-700 dark:text-slate-200 tracking-tighter">{scan.disease}</p>
-                      <p className="text-[10px] opacity-40 font-bold tracking-widest">{scan.timestamp?.toDate() ? scan.timestamp.toDate().toLocaleDateString() : 'Saving...'}</p>
+                      <p className="font-black text-sm uppercase text-slate-800 dark:text-slate-200 tracking-tighter">{scan.disease}</p>
+                      <p className="text-[10px] opacity-60 font-bold tracking-widest">{scan.timestamp?.toDate() ? scan.timestamp.toDate().toLocaleDateString() : 'Saving...'}</p>
                    </div>
-                   <div className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${scan.status === 'healthy' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}`}>
+                   <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest ${scan.status === 'healthy' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}`}>
                       {scan.status}
                    </div>
                 </div>
               )) : (
-                <p className="text-center py-10 opacity-30 text-xs italic font-black uppercase tracking-[0.2em]">No previous scans</p>
+                <p className="text-center py-10 opacity-40 text-xs italic font-black uppercase tracking-[0.2em]">No previous scans</p>
               )}
            </div>
         </div>
