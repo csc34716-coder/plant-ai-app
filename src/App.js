@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { db } from "./firebase"; 
 import { collection, addDoc, serverTimestamp, query, orderBy, onSnapshot, limit } from "firebase/firestore";
 import { Upload, Loader2, Moon, Sun, Leaf, Image as ImageIcon, CheckCircle2, AlertCircle, History } from "lucide-react";
+import './index.css';
 
 function App() {
   const [image, setImage] = useState(null);
